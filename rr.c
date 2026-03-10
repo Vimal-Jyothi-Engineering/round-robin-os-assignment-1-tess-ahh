@@ -1,69 +1,73 @@
 #include <stdio.h>
+#include <string.h>
 
-#define MAX 100
+struct process {
+    char pid[10];
+    int at, bt, rt;
+    int ct, wt, tat;
+};
 
 int main() {
-    int n, q;
-    int pid[MAX], at[MAX], bt[MAX], rt[MAX];
-    int ct[MAX], tat[MAX], wt[MAX];
-    int completed = 0, time = 0;
-    int done[MAX];
-
+    int n, tq;
     scanf("%d", &n);
 
-    for (int i = 0; i < n; i++) {
-        scanf("%d %d %d", &pid[i], &at[i], &bt[i]);
-        rt[i] = bt[i];
-        done[i] = 0;
+    struct process p[20];
+
+    for(int i = 0; i < n; i++) {
+        scanf("%s %d %d", p[i].pid, &p[i].at, &p[i].bt);
+        p[i].rt = p[i].bt;
     }
 
-    scanf("%d", &q);
+    scanf("%d", &tq);
 
-    while (completed < n) {
-        int progress = 0;
+    int time = 0, completed = 0;
 
-        for (int i = 0; i < n; i++) {
-            if (done[i] == 0 && at[i] <= time && rt[i] > 0) {
-                progress = 1;
+    while(completed < n) {
+        int done = 1;
 
-                if (rt[i] > q) {
-                    time += q;
-                    rt[i] -= q;
-                } else {
-                    time += rt[i];
-                    rt[i] = 0;
-                    ct[i] = time;
-                    done[i] = 1;
+        for(int i = 0; i < n; i++) {
+
+            if(p[i].rt > 0 && p[i].at <= time) {
+
+                done = 0;
+
+                if(p[i].rt > tq) {
+                    time += tq;
+                    p[i].rt -= tq;
+                }
+                else {
+                    time += p[i].rt;
+                    p[i].ct = time;
+                    p[i].rt = 0;
                     completed++;
                 }
             }
         }
 
-        if (!progress) {
+        if(done)
             time++;
-        }
     }
 
-    float total_wt = 0, total_tat = 0;
-    for (int i = 0; i < n; i++) {
-        tat[i] = ct[i] - at[i];
-        wt[i]  = tat[i] - bt[i];
-        total_tat += tat[i];
-        total_wt  += wt[i];
+    float avg_wt = 0, avg_tat = 0;
+
+    for(int i = 0; i < n; i++) {
+        p[i].tat = p[i].ct - p[i].at;
+        p[i].wt = p[i].tat - p[i].bt;
+
+        avg_wt += p[i].wt;
+        avg_tat += p[i].tat;
     }
 
     printf("Waiting Time:\n");
-    for (int i = 0; i < n; i++) {
-        printf("%d %d\n", pid[i], wt[i]);
-    }
+    for(int i = 0; i < n; i++)
+        printf("%s %d\n", p[i].pid, p[i].wt);
 
-    printf("\nTurnaround Time:\n");
-    for (int i = 0; i < n; i++) {
-        printf("%d %d\n", pid[i], tat[i]);
-    }
+    printf("Turnaround Time:\n");
+    for(int i = 0; i < n; i++)
+        printf("%s %d\n", p[i].pid, p[i].tat);
 
-    printf("\nAverage Waiting Time: %.2f\n", total_wt / n);
-    printf("Average Turnaround Time: %.2f\n", total_tat / n);
+    printf("Average Waiting Time: %.2f\n", avg_wt / n);
+    printf("Average Turnaround Time: %.2f\n", avg_tat / n);
 
     return 0;
 }
