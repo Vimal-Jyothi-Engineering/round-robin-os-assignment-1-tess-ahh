@@ -1,0 +1,163 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Test 1
+      id: test-1
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Test 1
+        setup-command: ''
+        command: gcc rr.c -o rr && ./rr
+        input: |-
+          4
+          P1 0 5
+          P2 1 4
+          P3 2 2
+          P4 3 1
+          2
+        expected-output: |-
+          Waiting Time:
+          P1 7
+          P2 6
+          P3 2
+          P4 3
+          Turnaround Time:
+          P1 12
+          P2 10
+          P3 4
+          P4 4
+          Average Waiting Time: 4.50
+          Average Turnaround Time: 7.50
+        comparison-method: exact
+        timeout: 10
+        max-score: 8
+    - name: Test 2
+      id: test-2
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Test 2
+        setup-command: ''
+        command: gcc rr.c -o rr && ./rr
+        input: |-
+          3
+          P1 0 6
+          P2 1 4
+          P3 2 2
+          3
+        expected-output: |-
+          Waiting Time:
+          P1 5
+          P2 7
+          P3 4
+          Turnaround Time:
+          P1 11
+          P2 11
+          P3 6
+          Average Waiting Time: 5.33
+          Average Turnaround Time: 9.33
+        comparison-method: exact
+        timeout: 10
+        max-score: 10
+    - name: Test 3
+      id: test-3
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Test 3
+        setup-command: ''
+        command: gcc rr.c -o rr && ./rr
+        input: |-
+          4
+          P1 0 3
+          P2 0 4
+          P3 0 5
+          P4 0 6
+          2
+        expected-output: |-
+          Waiting Time:
+          P1 6
+          P2 7
+          P3 11
+          P4 12
+          Turnaround Time:
+          P1 9
+          P2 11
+          P3 16
+          P4 18
+          Average Waiting Time: 9.00
+          Average Turnaround Time: 13.50
+        comparison-method: exact
+        timeout: 10
+        max-score: 10
+    - name: Test 4
+      id: test-4
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Test 4
+        setup-command: ''
+        command: gcc rr.c -o rr && ./rr
+        input: |-
+          2
+          P1 2 5
+          P2 4 3
+          2
+        expected-output: |-
+          Waiting Time:
+          P1 3
+          P2 2
+          Turnaround Time:
+          P1 8
+          P2 5
+          Average Waiting Time: 2.50
+          Average Turnaround Time: 6.50
+        comparison-method: exact
+        timeout: 10
+        max-score: 8
+    - name: Test 5
+      id: test-5
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Test 5
+        setup-command: ''
+        command: gcc rr.c -o rr && ./rr
+        input: |-
+          3
+          P1 0 2
+          P2 1 3
+          P3 2 4
+          1
+        expected-output: |-
+          Waiting Time:
+          P1 2
+          P2 3
+          P3 3
+          Turnaround Time:
+          P1 4
+          P2 6
+          P3 7
+          Average Waiting Time: 2.67
+          Average Turnaround Time: 5.67
+        comparison-method: exact
+        timeout: 10
+        max-score: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TEST-1_RESULTS: "${{steps.test-1.outputs.result}}"
+        TEST-2_RESULTS: "${{steps.test-2.outputs.result}}"
+        TEST-3_RESULTS: "${{steps.test-3.outputs.result}}"
+        TEST-4_RESULTS: "${{steps.test-4.outputs.result}}"
+        TEST-5_RESULTS: "${{steps.test-5.outputs.result}}"
+      with:
+        runners: test-1,test-2,test-3,test-4,test-5
